@@ -6,6 +6,18 @@
 
 ---
 
+## 💡 Ý tưởng & Nguyên nhân ra đời
+
+**GreenPoro** được lấy cảm hứng và phát triển dựa trên trang web [Pomofocus.io](https://pomofocus.io/). Khi sử dụng trang web đó, tác giả nhận thấy một số hạn chế:
+- Chỉ có đồng hồ bấm giờ với thời gian học và thời gian nghỉ cố định.
+- Không lưu lại lịch sử hay thời gian làm việc thực tế.
+- Không tích hợp sẵn nhạc nền tập trung.
+- Không tích hợp danh sách công việc (To-do list) để quản lý trực tiếp.
+
+Chính vì vậy, **GreenPoro** đã được phát triển để tích hợp đầy đủ các tính năng này, mang lại trải nghiệm tiện lợi và tập trung nhất cho bạn.
+
+---
+
 ## 📸 Giao diện ứng dụng
 
 *Gợi ý: Bạn có thể chụp ảnh màn hình dự án và lưu vào thư mục `assets/` rồi cập nhật liên kết dưới đây.*
@@ -82,72 +94,6 @@ GreenPoro/
 ├── app.js           # Xử lý toàn bộ logic ứng dụng, sự kiện, phát nhạc và âm báo
 └── README.md        # Tài liệu hướng dẫn sử dụng dự án (File này)
 ```
-
----
-
-## 🚀 Hướng dẫn triển khai lên GitHub Pages (Deploy)
-
-Dự án này là một trang web tĩnh thuần túy (Static Website), do đó bạn có thể dễ dàng triển khai miễn phí lên **GitHub Pages** chỉ trong vài bước:
-
-### Bước 1: Khởi tạo Git và đẩy mã nguồn lên GitHub
-Mở terminal tại thư mục dự án và thực hiện các lệnh sau:
-```bash
-# Khởi tạo git (nếu chưa khởi tạo)
-git init
-
-# Thêm tất cả các file
-git add .
-
-# Cam kết thay đổi
-git commit -m "Initial commit with GreenPoro app"
-
-# Tạo nhánh chính
-git branch -M main
-
-# Liên kết với kho lưu trữ GitHub của bạn
-git remote add origin https://github.com/USERNAME/REPO_NAME.git
-
-# Đẩy mã nguồn lên GitHub
-git push -u origin main
-```
-*(Thay thế `USERNAME` bằng tên tài khoản và `REPO_NAME` bằng tên repository của bạn trên GitHub).*
-
-### Bước 2: Kích hoạt GitHub Pages
-1. Truy cập vào kho lưu trữ (Repository) của bạn trên trang web GitHub.
-2. Nhấp vào tab **Settings** (Cài đặt) ở thanh công cụ phía trên.
-3. Ở menu bên trái, tìm đến mục **Pages** (dưới phần *Code and automation*).
-4. Tại phần **Build and deployment**:
-   - **Source**: Chọn `Deploy from a branch` (mặc định).
-   - **Branch**: Chọn nhánh `main` (hoặc `master`) và thư mục gốc `/ (root)`.
-5. Nhấp vào nút **Save** (Lưu).
-
-### Bước 3: Hoàn tất và sử dụng
-- Sau khoảng 1–2 phút, hãy tải lại trang. Bạn sẽ thấy một thông báo chứa đường dẫn trang web trực tuyến của mình ở phía đầu trang cài đặt GitHub Pages, có định dạng:
-  `https://USERNAME.github.io/REPO_NAME/`
-- Mỗi khi bạn push mã nguồn mới lên nhánh `main`, GitHub sẽ tự động cập nhật phiên bản mới nhất cho trang web của bạn.
-
----
-
-## 💻 Cách chạy dự án dưới máy cục bộ (Local Development)
-
-Vì GreenPoro không sử dụng các framework hay công cụ đóng gói (bundler), bạn có thể chạy dự án trực tiếp rất đơn giản:
-
-### Cách 1: Mở trực tiếp file (Đơn giản nhất)
-Bạn chỉ cần click đúp vào file `index.html` trong thư mục dự án để chạy ngay trên trình duyệt web.
-
-### Cách 2: Sử dụng Local Server (Khuyên dùng)
-Do trình duyệt có một số cơ chế bảo mật (như CORS) khi tải một số tài nguyên local, việc chạy qua một local server sẽ giúp ứng dụng hoạt động ổn định và mô phỏng chính xác nhất môi trường deploy:
-
-- **Nếu bạn dùng VS Code:** Cài đặt extension **Live Server**, sau đó chuột phải vào file `index.html` và chọn **Open with Live Server**.
-- **Nếu máy bạn đã cài Python:**
-  ```bash
-  python -m http.server 8000
-  ```
-  Sau đó truy cập địa chỉ `http://localhost:8000` trên trình duyệt.
-- **Nếu máy bạn có Node.js:**
-  ```bash
-  npx serve
-  ```
 
 ---
 
