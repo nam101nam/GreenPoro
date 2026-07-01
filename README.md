@@ -2,7 +2,7 @@
 
 **GreenPoro** là một ứng dụng quản lý thời gian Pomodoro và danh sách công việc (Task Manager) tối giản, hiện đại và tinh tế. Được thiết kế với gam màu xanh lục dịu mắt (Soft Sage Green) kết hợp cùng hiệu ứng chuyển động mượt mà, GreenPoro mang lại trải nghiệm tập trung tối đa, giúp bạn quản lý công việc và cân bằng thời gian nghỉ ngơi hiệu quả ngay trên trình duyệt.
 
-👉 **Trải nghiệm trực tuyến (Demo):** [Link GitHub Pages của bạn tại đây, ví dụ: https://username.github.io/GreenPoro/]
+👉 **Trải nghiệm trực tuyến (Demo):** [https://nam101nam.github.io/GreenPoro/](https://nam101nam.github.io/GreenPoro/)
 
 ---
 
