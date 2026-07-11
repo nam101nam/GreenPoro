@@ -1333,3 +1333,190 @@ body {
   }
 }
 
+/* =============================================================
+   9. Weekly Summary & Achievements Widgets Styles
+   ============================================================= */
+.weekly-summary-card,
+.achievements-card {
+  background-color: #e8f0dc;
+  border: 2px solid var(--dark-accent);
+  border-radius: var(--border-radius-sm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.weekly-summary-card:hover,
+.achievements-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.widget-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.widget-icon {
+  font-size: 16px;
+}
+
+.widget-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--dark-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Bar Chart Styles */
+.bar-chart {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 90px;
+  padding: 8px 4px 0 4px;
+  background-color: rgba(20, 50, 9, 0.03);
+  border: 1.5px solid rgba(20, 50, 9, 0.15);
+  border-radius: var(--border-radius-sm);
+}
+
+.chart-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  height: 100%;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.bar-wrapper {
+  height: 56px;
+  width: 14px;
+  background-color: rgba(20, 50, 9, 0.05);
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.bar-fill {
+  background-color: var(--primary);
+  width: 100%;
+  border-radius: 3px;
+  transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.bar-fill:hover {
+  background-color: var(--dark-accent);
+}
+
+.bar-fill[data-tooltip]::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  background-color: var(--dark-accent);
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  pointer-events: none;
+  box-shadow: var(--shadow-sm);
+  z-index: 100;
+}
+
+.bar-fill[data-tooltip]:hover::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+.chart-column .day-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* Badge Rows Styles */
+.badges-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.badge-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.badge-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--dark-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  background-color: #e0e5db; /* Default locked background */
+  color: var(--text-muted);
+  filter: grayscale(1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.badge-circle.unlocked {
+  background-color: var(--dark-accent);
+  color: #ffffff;
+  filter: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.badge-circle.unlocked:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: var(--shadow-md);
+}
+
+.badge-circle[data-tooltip]::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  background-color: var(--dark-accent);
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  pointer-events: none;
+  box-shadow: var(--shadow-sm);
+  z-index: 100;
+}
+
+.badge-circle[data-tooltip]:hover::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+

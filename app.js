@@ -1106,6 +1106,147 @@ function updateSidebarStats() {
   totalPomoCountDisplay.textContent = totalPomo;
   currentStreakDisplay.textContent = streak;
   activeDaysCountDisplay.textContent = activeDays;
+
+  // Render weekly summary & achievements widgets
+  renderWeeklySummary();
+  renderAchievements(totalPomo, streak, activeDays);
+}
+
+function renderWeeklySummary() {
+  const barChartContainer = document.getElementById('weekly-bar-chart');
+  if (!barChartContainer) return;
+  
+  barChartContainer.innerHTML = '';
+  
+  const today = new Date();
+  const day = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+  const monday = new Date(today);
+  monday.setDate(today.getDate() + diffToMonday);
+  
+  const weekDays = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    weekDays.push(d);
+  }
+  
+  const dayMinutesList = weekDays.map(d => {
+    const dateStr = getLocalDateString(d);
+    const pomoCount = dailyHistory[dateStr] || 0;
+    return pomoCount * settings.pomodoro;
+  });
+  
+  // Find maximum to scale height, minimum scale max is 100 minutes
+  const maxMins = Math.max(100, ...dayMinutesList);
+  
+  const dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+  const dayFullNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  
+  weekDays.forEach((date, i) => {
+    const mins = dayMinutesList[i];
+    const pct = (mins / maxMins) * 100;
+    
+    const colDiv = document.createElement('div');
+    colDiv.className = 'chart-column';
+    
+    const wrapperDiv = document.createElement('div');
+    wrapperDiv.className = 'bar-wrapper';
+    
+    const fillDiv = document.createElement('div');
+    fillDiv.className = 'bar-fill';
+    fillDiv.style.height = `${pct}%`;
+    
+    if (mins > 0) {
+      if (mins >= 100) {
+        fillDiv.style.backgroundColor = 'var(--dark-accent)';
+      }
+    } else {
+      fillDiv.style.height = '0%';
+    }
+    
+    const options = { month: 'short', day: 'numeric' };
+    const formattedDate = date.toLocaleDateString('en-US', options);
+    fillDiv.setAttribute('data-tooltip', `${mins} mins on ${dayFullNames[i]} (${formattedDate})`);
+    
+    wrapperDiv.appendChild(fillDiv);
+    
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'day-label';
+    labelSpan.textContent = dayLabels[i];
+    
+    colDiv.appendChild(wrapperDiv);
+    colDiv.appendChild(labelSpan);
+    
+    barChartContainer.appendChild(colDiv);
+  });
+}
+
+function renderAchievements(totalPomo, streak, activeDays) {
+  const achievementsContainer = document.getElementById('achievements-row');
+  if (!achievementsContainer) return;
+  
+  achievementsContainer.innerHTML = '';
+  
+  const maxPomoInADay = Math.max(0, ...Object.values(dailyHistory));
+  
+  const achievements = [
+    {
+      id: 'first-step',
+      icon: '🎯',
+      name: 'First Step',
+      desc: 'Complete 1 Pomodoro',
+      unlocked: totalPomo >= 1,
+      progress: `${Math.min(1, totalPomo)}/1`
+    },
+    {
+      id: 'streak-starter',
+      icon: '🔥',
+      name: 'Streak Starter',
+      desc: 'Reach a 3-day streak',
+      unlocked: streak >= 3,
+      progress: `${Math.min(3, streak)}/3`
+    },
+    {
+      id: 'consistency',
+      icon: '🌿',
+      name: 'Consistency',
+      desc: 'Focus on 3 different days',
+      unlocked: activeDays >= 3,
+      progress: `${Math.min(3, activeDays)}/3`
+    },
+    {
+      id: 'focus-master',
+      icon: '⭐',
+      name: 'Focus Master',
+      desc: 'Complete 10 Pomodoros',
+      unlocked: totalPomo >= 10,
+      progress: `${Math.min(10, totalPomo)}/10`
+    },
+    {
+      id: 'super-day',
+      icon: '🏆',
+      name: 'Super Day',
+      desc: 'Complete 4 Pomodoros in one day',
+      unlocked: maxPomoInADay >= 4,
+      progress: `${Math.min(4, maxPomoInADay)}/4`
+    }
+  ];
+  
+  achievements.forEach(ach => {
+    const badgeContainer = document.createElement('div');
+    badgeContainer.className = 'badge-container';
+    
+    const badgeCircle = document.createElement('div');
+    badgeCircle.className = `badge-circle ${ach.unlocked ? 'unlocked' : ''}`;
+    badgeCircle.textContent = ach.icon;
+    
+    const statusText = ach.unlocked ? 'Unlocked!' : 'Locked';
+    badgeCircle.setAttribute('data-tooltip', `${ach.name}: ${ach.desc} (${ach.progress}) - ${statusText}`);
+    
+    badgeContainer.appendChild(badgeCircle);
+    achievementsContainer.appendChild(badgeContainer);
+  });
 }
 
 // Window focus daily sync check
