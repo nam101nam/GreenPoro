@@ -20,6 +20,7 @@ let stats = {
 
 let tasks = [];
 let activeTaskId = null;
+let dailyHistory = {};
 
 // Collapsible task list states
 let todoListOpen = true;
@@ -92,6 +93,7 @@ function init() {
   resetTimer(currentMode);
   renderTasks();
   updateStatsDisplay();
+  renderContributionGraph();
   
   // Asynchronously inject YouTube Player API Script
   const tag = document.createElement('script');
@@ -153,6 +155,15 @@ function loadFromLocalStorage() {
     activeTaskId = savedActiveTaskId;
   }
   
+  // Load daily history
+  const savedHistory = localStorage.getItem('greenporo_daily_history');
+  if (savedHistory) {
+    dailyHistory = JSON.parse(savedHistory);
+  } else {
+    dailyHistory = {};
+  }
+  checkDailyReset();
+  
   // Populate settings modal with current values
   settingPomodoro.value = settings.pomodoro;
   settingShortBreak.value = settings.shortBreak;
@@ -175,6 +186,10 @@ function saveStatsToLocalStorage() {
 function saveTasksToLocalStorage() {
   localStorage.setItem('greenporo_tasks', JSON.stringify(tasks));
   localStorage.setItem('greenporo_active_task_id', activeTaskId || '');
+}
+
+function saveDailyHistoryToLocalStorage() {
+  localStorage.setItem('greenporo_daily_history', JSON.stringify(dailyHistory));
 }
 
 // -------------------------------------------------------------
@@ -275,8 +290,15 @@ function handleTimerCompletion() {
     // Increment Stats
     stats.cycles += 1;
     stats.focusTime += settings.pomodoro;
+    
+    // Save to dailyHistory
+    const todayStr = getLocalDateString();
+    dailyHistory[todayStr] = stats.cycles;
+    saveDailyHistoryToLocalStorage();
+    
     saveStatsToLocalStorage();
     updateStatsDisplay();
+    renderContributionGraph();
     
     // Check next state: Short break or Long break?
     if (stats.cycles % settings.interval === 0) {
@@ -867,6 +889,11 @@ function handleSaveSettings() {
   saveSettingsToLocalStorage();
   closeSettingsModal();
   
+  // Recalculate focus time based on new setting
+  stats.focusTime = stats.cycles * settings.pomodoro;
+  saveStatsToLocalStorage();
+  updateStatsDisplay();
+  
   musicEnabled = autoMusic;
   manageMusicPlayback();
 }
@@ -917,3 +944,172 @@ function setupEventListeners() {
 
 // Start Application on Load
 window.addEventListener('DOMContentLoaded', init);
+
+// -------------------------------------------------------------
+// 8. Daily Reset & Contribution Graph Generator
+// -------------------------------------------------------------
+function getLocalDateString(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function checkDailyReset() {
+  const todayStr = getLocalDateString();
+  const todayCycles = dailyHistory[todayStr] || 0;
+  
+  stats.cycles = todayCycles;
+  stats.focusTime = todayCycles * settings.pomodoro;
+  saveStatsToLocalStorage();
+  updateStatsDisplay();
+}
+
+function calculateStreak(history) {
+  let streak = 0;
+  let checkDate = new Date();
+  
+  // Check if today has at least 1 pomo
+  const todayStr = getLocalDateString(checkDate);
+  if (history[todayStr] && history[todayStr] > 0) {
+    streak = 1;
+    // Go backwards from yesterday
+    checkDate.setDate(checkDate.getDate() - 1);
+    while (true) {
+      const dateStr = getLocalDateString(checkDate);
+      if (history[dateStr] && history[dateStr] > 0) {
+        streak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+  } else {
+    // If today is 0, check if yesterday was active to continue the streak
+    checkDate.setDate(checkDate.getDate() - 1);
+    const yesterdayStr = getLocalDateString(checkDate);
+    if (history[yesterdayStr] && history[yesterdayStr] > 0) {
+      streak = 1;
+      checkDate.setDate(checkDate.getDate() - 1);
+      while (true) {
+        const dateStr = getLocalDateString(checkDate);
+        if (history[dateStr] && history[dateStr] > 0) {
+          streak++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        } else {
+          break;
+        }
+      }
+    }
+  }
+  return streak;
+}
+
+function renderContributionGraph() {
+  const gridContainer = document.getElementById('calendar-grid');
+  const monthLabelsContainer = document.getElementById('month-labels');
+  
+  if (!gridContainer || !monthLabelsContainer) return;
+  
+  gridContainer.innerHTML = '';
+  monthLabelsContainer.innerHTML = '';
+  
+  const today = new Date();
+  const currentDayOfWeek = today.getDay();
+  
+  // Find current Sunday
+  const currentSunday = new Date(today);
+  currentSunday.setDate(today.getDate() - currentDayOfWeek);
+  
+  // Find Sunday 52 weeks ago
+  const startDate = new Date(currentSunday);
+  startDate.setDate(currentSunday.getDate() - 52 * 7);
+  
+  // Generate 371 days
+  const days = [];
+  const dateCursor = new Date(startDate);
+  for (let i = 0; i < 371; i++) {
+    days.push(new Date(dateCursor));
+    dateCursor.setDate(dateCursor.getDate() + 1);
+  }
+  
+  // Generate Month Labels (53 columns)
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  let lastMonthName = "";
+  
+  for (let col = 0; col < 53; col++) {
+    const firstDayOfWeek = days[col * 7];
+    const monthName = monthNames[firstDayOfWeek.getMonth()];
+    
+    const labelSpan = document.createElement('span');
+    if (monthName !== lastMonthName) {
+      labelSpan.textContent = monthName;
+      lastMonthName = monthName;
+    }
+    monthLabelsContainer.appendChild(labelSpan);
+  }
+  
+  // Generate Grid Cells
+  const todayTime = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+  
+  days.forEach(date => {
+    const dateStr = getLocalDateString(date);
+    const cellTime = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+    const count = dailyHistory[dateStr] || 0;
+    
+    const cell = document.createElement('div');
+    cell.className = 'calendar-cell';
+    
+    if (cellTime > todayTime) {
+      cell.classList.add('future');
+    } else {
+      let level = 0;
+      if (count > 0) {
+        if (count === 1) level = 1;
+        else if (count === 2) level = 2;
+        else if (count === 3) level = 3;
+        else level = 4;
+      }
+      cell.classList.add(`level-${level}`);
+      
+      const options = { month: 'short', day: 'numeric', year: 'numeric' };
+      const formattedDate = date.toLocaleDateString('en-US', options);
+      const pomoWord = count === 1 ? 'pomodoro' : 'pomodoros';
+      cell.setAttribute('data-tooltip', `${count} ${pomoWord} on ${formattedDate}`);
+    }
+    
+    gridContainer.appendChild(cell);
+  });
+  
+  updateSidebarStats();
+}
+
+function updateSidebarStats() {
+  const totalPomoCountDisplay = document.getElementById('total-pomo-count');
+  const currentStreakDisplay = document.getElementById('current-streak');
+  const activeDaysCountDisplay = document.getElementById('active-days-count');
+  
+  if (!totalPomoCountDisplay || !currentStreakDisplay || !activeDaysCountDisplay) return;
+  
+  let totalPomo = 0;
+  let activeDays = 0;
+  
+  Object.values(dailyHistory).forEach(count => {
+    if (count > 0) {
+      totalPomo += count;
+      activeDays += 1;
+    }
+  });
+  
+  const streak = calculateStreak(dailyHistory);
+  
+  totalPomoCountDisplay.textContent = totalPomo;
+  currentStreakDisplay.textContent = streak;
+  activeDaysCountDisplay.textContent = activeDays;
+}
+
+// Window focus daily sync check
+window.addEventListener('focus', () => {
+  checkDailyReset();
+  renderContributionGraph();
+});

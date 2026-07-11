@@ -14,7 +14,67 @@
 </head>
 <body>
 
-  <div class="app-container">
+  <div class="main-layout">
+    <!-- Sidebar -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-icon">🌿</span>
+        <h2 class="sidebar-title">Focus Journey</h2>
+      </div>
+      
+      <!-- Contribution Section -->
+      <div class="contribution-card">
+        <div class="contribution-summary">
+          <div class="summary-stat">
+            <span class="stat-value" id="total-pomo-count">0</span>
+            <span class="stat-label">Total Pomo</span>
+          </div>
+          <div class="summary-stat">
+            <span class="stat-value" id="current-streak">0</span>
+            <span class="stat-label">Day Streak</span>
+          </div>
+          <div class="summary-stat">
+            <span class="stat-value" id="active-days-count">0</span>
+            <span class="stat-label">Active Days</span>
+          </div>
+        </div>
+
+        <div class="calendar-wrapper">
+          <div class="month-labels-container" id="month-labels">
+            <!-- Dynamic month labels -->
+          </div>
+          <div class="calendar-container">
+            <div class="day-labels">
+              <div></div>
+              <div>Mon</div>
+              <div></div>
+              <div>Wed</div>
+              <div></div>
+              <div>Fri</div>
+              <div></div>
+            </div>
+            <div class="calendar-grid" id="calendar-grid">
+              <!-- Dynamic calendar days -->
+            </div>
+          </div>
+          
+          <div class="calendar-footer">
+            <span class="calendar-caption">Focus history</span>
+            <div class="calendar-legend">
+              <span>Less</span>
+              <div class="legend-cell level-0"></div>
+              <div class="legend-cell level-1"></div>
+              <div class="legend-cell level-2"></div>
+              <div class="legend-cell level-3"></div>
+              <div class="legend-cell level-4"></div>
+              <span>More</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="app-container">
     <!-- Header -->
     <header class="app-header">
       <div class="logo">
@@ -77,12 +137,12 @@
       <section class="stats-section">
         <div class="stats-card">
           <div class="stats-item">
-            <span class="stats-label">Completed Cycles:</span>
+            <span class="stats-label">Today's Cycles:</span>
             <span class="stats-value" id="cycles-completed">0</span>
           </div>
           <div class="stats-divider"></div>
           <div class="stats-item">
-            <span class="stats-label">Total Focus Time:</span>
+            <span class="stats-label">Today's Focus:</span>
             <span class="stats-value" id="total-focus-time">0 mins</span>
           </div>
         </div>
@@ -123,6 +183,7 @@
       <p>Plan and focus effectively with GreenPoro 🌿</p>
     </footer>
   </div>
+</div>
 
   <!-- Settings Modal -->
   <div id="settings-modal" class="modal-backdrop hidden">
