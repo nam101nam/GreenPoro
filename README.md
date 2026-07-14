@@ -8,7 +8,7 @@
 
 ## 💡 Ý tưởng & Nguyên nhân ra đời
 
-**GreenPoro** được lấy cảm hứng và phát triển dựa trên trang web [Pomofocus.io](https://pomofocus.io/). Nhận thấy một số điểm có thể tối ưu hơn từ phiên bản gốc, GreenPoro đã được xây dựng nhằm tích hợp thêm các công cụ hỗ trợ mạnh mẽ, giúp nâng cao động lực và theo dõi tiến trình làm việc lâu dài:
+**GreenPoro** được lấy cảm hứng và phát triển dựa trên trang web [Pomofocus.io](https://pomofocus.io/). Nhận thấy một số điểm có thể tối ưu hơn từ phiên bản gốc, GreenPoro đã được xây dựng nhằm tích hợp thêm các công cụ hỗ trợ mạnh mẽ, giúp nâng cao động lực và theo dõi tiến trình làm việc lâu dài như:
 - Tích hợp **Focus Journey** (Bản đồ đóng góp nhiệt huyết tương tự GitHub) giúp lưu trữ lịch sử và tần suất tập trung.
 - Biểu đồ **Weekly Summary** trực quan hóa thời gian học tập thực tế mỗi ngày trong tuần.
 - Hệ thống **Thành tựu (Achievements)** tăng tính tương tác và động lực hoàn thành mục tiêu.
