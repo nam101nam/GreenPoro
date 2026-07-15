@@ -6,6 +6,7 @@ let settings = {
   interval: 4,
   autoMusic: true,
   soundAlert: true,
+  volume: 50,
   ytLinks: {
     pomodoro: 'https://www.youtube.com/watch?v=lTRiuFIWV54',
     shortBreak: 'https://www.youtube.com/watch?v=BTYAsjAVa3I',
@@ -57,6 +58,9 @@ const musicPlayIcon = document.getElementById('music-play-icon');
 const musicPauseIcon = document.getElementById('music-pause-icon');
 const musicTitle = document.getElementById('music-title');
 const musicStatus = document.getElementById('music-status');
+const volumeSlider = document.getElementById('music-volume-slider');
+const volumePercentage = document.getElementById('volume-percentage');
+const volumeIconContainer = document.getElementById('volume-icon-container');
 
 // Stats Elements
 const cyclesCompletedDisplay = document.getElementById('cycles-completed');
@@ -173,6 +177,7 @@ function loadFromLocalStorage() {
   settingSoundAlert.checked = settings.soundAlert;
   
   musicEnabled = settings.autoMusic;
+  setVolumeLevel(settings.volume || 50);
 }
 
 function saveSettingsToLocalStorage() {
@@ -504,6 +509,9 @@ window.onYouTubeIframeAPIReady = function() {
 
 function onPlayerReady(event) {
   ytPlayerReady = true;
+  if (ytPlayer && typeof ytPlayer.setVolume === 'function') {
+    ytPlayer.setVolume(settings.volume || 50);
+  }
   manageMusicPlayback();
 }
 
@@ -534,9 +542,62 @@ function updateMusicUI(isCurrentlyPlaying, statusText) {
   if (isCurrentlyPlaying) {
     musicPlayIcon.classList.add('hidden');
     musicPauseIcon.classList.remove('hidden');
+    document.querySelector('.music-card')?.classList.add('playing');
   } else {
     musicPlayIcon.classList.remove('hidden');
     musicPauseIcon.classList.add('hidden');
+    document.querySelector('.music-card')?.classList.remove('playing');
+  }
+}
+
+function updateVolumeUI(volumeVal) {
+  if (volumePercentage) {
+    volumePercentage.textContent = `${volumeVal}%`;
+  }
+  if (volumeSlider) {
+    volumeSlider.value = volumeVal;
+    volumeSlider.style.background = `linear-gradient(to right, var(--primary) 0%, var(--primary) ${volumeVal}%, var(--primary-lighter) ${volumeVal}%, var(--primary-lighter) 100%)`;
+  }
+  if (volumeIconContainer) {
+    if (volumeVal === 0) {
+      volumeIconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="volume-icon"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
+    } else if (volumeVal < 50) {
+      volumeIconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="volume-icon"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
+    } else {
+      volumeIconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="volume-icon"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`;
+    }
+  }
+}
+
+function setVolumeLevel(val) {
+  settings.volume = val;
+  updateVolumeUI(val);
+  
+  if (audioPlayer) {
+    audioPlayer.volume = val / 100;
+    audioPlayer.muted = (val === 0);
+  }
+  
+  if (ytPlayer && ytPlayerReady && typeof ytPlayer.setVolume === 'function') {
+    ytPlayer.setVolume(val);
+    if (val === 0) {
+      if (typeof ytPlayer.mute === 'function') ytPlayer.mute();
+    } else {
+      if (typeof ytPlayer.unMute === 'function') ytPlayer.unMute();
+    }
+  }
+}
+
+let preMuteVolume = 50;
+function toggleMute() {
+  const currentVal = parseInt(volumeSlider.value) || 0;
+  if (currentVal > 0) {
+    preMuteVolume = currentVal;
+    setVolumeLevel(0);
+    saveSettingsToLocalStorage();
+  } else {
+    setVolumeLevel(preMuteVolume || 50);
+    saveSettingsToLocalStorage();
   }
 }
 
@@ -879,6 +940,7 @@ function handleSaveSettings() {
     interval: interval,
     autoMusic: autoMusic,
     soundAlert: soundAlert,
+    volume: settings.volume,
     ytLinks: {
       pomodoro: ytPomodoro,
       shortBreak: ytShortBreak,
@@ -925,6 +987,43 @@ function setupEventListeners() {
   });
   
   musicToggleBtn.addEventListener('click', toggleMusicOption);
+
+  // Volume slider and mute controls
+  if (volumeSlider) {
+    volumeSlider.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value) || 0;
+      setVolumeLevel(val);
+    });
+    volumeSlider.addEventListener('change', (e) => {
+      saveSettingsToLocalStorage();
+    });
+  }
+
+  if (volumeIconContainer) {
+    volumeIconContainer.addEventListener('click', toggleMute);
+  }
+
+  // Sync native audio playback state to the UI buttons
+  if (audioPlayer) {
+    audioPlayer.addEventListener('play', () => {
+      const url = (settings.ytLinks[currentMode] || '').trim();
+      if (!isYoutubeUrl(url)) {
+        updateMusicUI(true, getMusicStatusText());
+      }
+    });
+    audioPlayer.addEventListener('pause', () => {
+      const url = (settings.ytLinks[currentMode] || '').trim();
+      if (!isYoutubeUrl(url)) {
+        updateMusicUI(false, getMusicStatusText());
+      }
+    });
+    audioPlayer.addEventListener('ended', () => {
+      const url = (settings.ytLinks[currentMode] || '').trim();
+      if (!isYoutubeUrl(url)) {
+        updateMusicUI(false, getMusicStatusText());
+      }
+    });
+  }
   
   // Task manager actions
   addTaskForm.addEventListener('submit', handleAddTask);
