@@ -8,9 +8,9 @@ let settings = {
   soundAlert: true,
   volume: 50,
   ytLinks: {
-    pomodoro: 'https://www.youtube.com/watch?v=lTRiuFIWV54',
-    shortBreak: 'https://www.youtube.com/watch?v=BTYAsjAVa3I',
-    longBreak: 'https://www.youtube.com/watch?v=r6VwPZqB4Wc'
+    pomodoro: 'https://www.youtube.com/watch?v=KVremu955Qk',
+    shortBreak: 'https://www.youtube.com/watch?v=u3XEyiLjk-s',
+    longBreak: 'https://www.youtube.com/watch?v=t1zP9ojJ_WE'
   }
 };
 
@@ -98,7 +98,7 @@ function init() {
   renderTasks();
   updateStatsDisplay();
   renderContributionGraph();
-  
+
   // Asynchronously inject YouTube Player API Script
   const tag = document.createElement('script');
   tag.src = "https://www.youtube.com/iframe_api";
@@ -120,22 +120,23 @@ function loadFromLocalStorage() {
       }
     };
   }
-  
+
   // Migration: Replace old dead default YouTube links with new stable ones
   let migrated = false;
   if (settings.ytLinks) {
-    if (settings.ytLinks.pomodoro === 'https://www.youtube.com/watch?v=tNkZsEC7B9g' || 
-        settings.ytLinks.pomodoro === 'https://www.youtube.com/watch?v=lTRruu-STEA') {
-      settings.ytLinks.pomodoro = 'https://www.youtube.com/watch?v=lTRiuFIWV54';
+    if (settings.ytLinks.pomodoro === 'https://www.youtube.com/watch?v=tNkZsEC7B9g' ||
+      settings.ytLinks.pomodoro === 'https://www.youtube.com/watch?v=lTRruu-STEA' ||
+      settings.ytLinks.pomodoro === 'https://www.youtube.com/watch?v=lTRiuFIWV54') {
+      settings.ytLinks.pomodoro = 'https://www.youtube.com/watch?v=KVremu955Qk&list=RDKVremu955Qk&start_radio=1';
       migrated = true;
     }
-    if (settings.ytLinks.shortBreak === 'https://www.youtube.com/watch?v=mPhYyv7-6kY' || 
-        settings.ytLinks.shortBreak === 'https://www.youtube.com/watch?v=kYJj-4yvP5A') {
+    if (settings.ytLinks.shortBreak === 'https://www.youtube.com/watch?v=mPhYyv7-6kY' ||
+      settings.ytLinks.shortBreak === 'https://www.youtube.com/watch?v=kYJj-4yvP5A') {
       settings.ytLinks.shortBreak = 'https://www.youtube.com/watch?v=BTYAsjAVa3I';
       migrated = true;
     }
-    if (settings.ytLinks.longBreak === 'https://www.youtube.com/watch?v=Dx5qFedd3Y4' || 
-        settings.ytLinks.longBreak === 'https://www.youtube.com/watch?v=vVj4u_3nN8s') {
+    if (settings.ytLinks.longBreak === 'https://www.youtube.com/watch?v=Dx5qFedd3Y4' ||
+      settings.ytLinks.longBreak === 'https://www.youtube.com/watch?v=vVj4u_3nN8s') {
       settings.ytLinks.longBreak = 'https://www.youtube.com/watch?v=r6VwPZqB4Wc';
       migrated = true;
     }
@@ -143,22 +144,22 @@ function loadFromLocalStorage() {
   if (migrated) {
     saveSettingsToLocalStorage();
   }
-  
+
   const savedStats = localStorage.getItem('greenporo_stats');
   if (savedStats) {
     stats = JSON.parse(savedStats);
   }
-  
+
   const savedTasks = localStorage.getItem('greenporo_tasks');
   if (savedTasks) {
     tasks = JSON.parse(savedTasks);
   }
-  
+
   const savedActiveTaskId = localStorage.getItem('greenporo_active_task_id');
   if (savedActiveTaskId) {
     activeTaskId = savedActiveTaskId;
   }
-  
+
   // Load daily history
   const savedHistory = localStorage.getItem('greenporo_daily_history');
   if (savedHistory) {
@@ -167,7 +168,7 @@ function loadFromLocalStorage() {
     dailyHistory = {};
   }
   checkDailyReset();
-  
+
   // Populate settings modal with current values
   settingPomodoro.value = settings.pomodoro;
   settingShortBreak.value = settings.shortBreak;
@@ -175,7 +176,7 @@ function loadFromLocalStorage() {
   settingInterval.value = settings.interval;
   settingAutoMusic.checked = settings.autoMusic;
   settingSoundAlert.checked = settings.soundAlert;
-  
+
   musicEnabled = settings.autoMusic;
   setVolumeLevel(settings.volume || 50);
 }
@@ -205,7 +206,7 @@ function resetTimer(mode) {
   currentMode = mode;
   timeLeft = settings[mode] * 60;
   duration = timeLeft;
-  
+
   // Update UI Tabs
   tabButtons.forEach(btn => {
     if (btn.dataset.mode === mode) {
@@ -214,7 +215,7 @@ function resetTimer(mode) {
       btn.classList.remove('active');
     }
   });
-  
+
   updateTimerDisplay();
   updateProgressBar();
   manageMusicPlayback();
@@ -226,7 +227,7 @@ function updateTimerDisplay() {
   const minutesStr = String(minutes).padStart(2, '0');
   const secondsStr = String(seconds).padStart(2, '0');
   timerDisplay.textContent = `${minutesStr}:${secondsStr}`;
-  
+
   // Also update browser tab title
   const modeLabel = currentMode === 'pomodoro' ? 'Focus' : 'Break';
   document.title = `[${minutesStr}:${secondsStr}] ${modeLabel} - GreenPoro 🌿`;
@@ -239,43 +240,43 @@ function updateProgressBar() {
 
 function startTimer() {
   if (isPlaying) return;
-  
+
   isPlaying = true;
   startBtn.textContent = 'PAUSE';
   startBtn.style.boxShadow = '0 2px 0 var(--dark-accent)';
   startBtn.style.transform = 'translateY(4px)';
-  
+
   // Set target timestamp to avoid browser background throttle drifting
   endTime = Date.now() + timeLeft * 1000;
-  
+
   timerInterval = setInterval(() => {
     const diff = endTime - Date.now();
     timeLeft = Math.max(0, Math.round(diff / 1000));
-    
+
     updateTimerDisplay();
     updateProgressBar();
-    
+
     if (timeLeft <= 0) {
       handleTimerCompletion();
     }
   }, 200);
-  
+
   manageMusicPlayback();
 }
 
 function stopTimer() {
   if (!isPlaying) return;
-  
+
   isPlaying = false;
   startBtn.textContent = 'START';
   startBtn.style.boxShadow = '0 6px 0 var(--dark-accent)';
   startBtn.style.transform = 'translateY(0)';
-  
+
   if (timerInterval) {
     clearInterval(timerInterval);
     timerInterval = null;
   }
-  
+
   manageMusicPlayback();
 }
 
@@ -289,22 +290,22 @@ function toggleTimer() {
 
 function handleTimerCompletion() {
   playChimeNotification();
-  
+
   let nextMode;
   if (currentMode === 'pomodoro') {
     // Increment Stats
     stats.cycles += 1;
     stats.focusTime += settings.pomodoro;
-    
+
     // Save to dailyHistory
     const todayStr = getLocalDateString();
     dailyHistory[todayStr] = stats.cycles;
     saveDailyHistoryToLocalStorage();
-    
+
     saveStatsToLocalStorage();
     updateStatsDisplay();
     renderContributionGraph();
-    
+
     // Check next state: Short break or Long break?
     if (stats.cycles % settings.interval === 0) {
       nextMode = 'longBreak';
@@ -315,12 +316,12 @@ function handleTimerCompletion() {
     // Break finished, go back to Pomodoro
     nextMode = 'pomodoro';
   }
-  
+
   isTransitioningMode = true;
 
   // Auto switch to next mode
   resetTimer(nextMode);
-  
+
   // Auto start next timer
   startTimer();
 
@@ -432,7 +433,7 @@ function updateAudioPlayback(forcePlay = false) {
         if (filename) {
           title = filename;
         }
-      } catch (e) {}
+      } catch (e) { }
 
       if (currentLoadedAudioUrl !== url) {
         currentLoadedAudioUrl = url;
@@ -461,14 +462,14 @@ function manageMusicPlayback() {
   if (youtubeLinkInput) {
     youtubeLinkInput.value = settings.ytLinks[currentMode] || '';
   }
-  
+
   updateAudioPlayback();
 }
 
 // Ensure toggle action uses updateAudioPlayback
 function toggleMusicOption() {
   musicEnabled = !musicEnabled;
-  
+
   if (musicEnabled) {
     updateAudioPlayback(true); // force play for immediate preview
   } else {
@@ -484,7 +485,7 @@ function handleYoutubeUrlChange() {
 }
 
 // YouTube Player Callbacks
-window.onYouTubeIframeAPIReady = function() {
+window.onYouTubeIframeAPIReady = function () {
   ytPlayer = new YT.Player('youtube-player', {
     height: '1',
     width: '1',
@@ -538,7 +539,7 @@ function onPlayerError(event) {
 
 function updateMusicUI(isCurrentlyPlaying, statusText) {
   musicStatus.textContent = statusText;
-  
+
   if (isCurrentlyPlaying) {
     musicPlayIcon.classList.add('hidden');
     musicPauseIcon.classList.remove('hidden');
@@ -572,12 +573,12 @@ function updateVolumeUI(volumeVal) {
 function setVolumeLevel(val) {
   settings.volume = val;
   updateVolumeUI(val);
-  
+
   if (audioPlayer) {
     audioPlayer.volume = val / 100;
     audioPlayer.muted = (val === 0);
   }
-  
+
   if (ytPlayer && ytPlayerReady && typeof ytPlayer.setVolume === 'function') {
     ytPlayer.setVolume(val);
     if (val === 0) {
@@ -603,30 +604,30 @@ function toggleMute() {
 
 function playChimeNotification() {
   if (!settings.soundAlert) return;
-  
+
   try {
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const now = audioCtx.currentTime;
-    
+
     // Synthesize C-major arpeggio chime sound
     const playTone = (freq, startTime, duration) => {
       const osc = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
-      
+
       osc.connect(gainNode);
       gainNode.connect(audioCtx.destination);
-      
+
       osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, startTime);
-      
+
       gainNode.gain.setValueAtTime(0, startTime);
       gainNode.gain.linearRampToValueAtTime(0.2, startTime + 0.04);
       gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-      
+
       osc.start(startTime);
       osc.stop(startTime + duration);
     };
-    
+
     // Play a series of 3 chime arpeggios, total lasting ~5 seconds
     for (let i = 0; i < 3; i++) {
       const delay = i * 1.4;
@@ -653,27 +654,27 @@ function updateStatsDisplay() {
 // -------------------------------------------------------------
 function renderTasks() {
   taskList.innerHTML = '';
-  
+
   if (tasks.length === 0) {
     emptyState.classList.remove('hidden');
     tasksCountDisplay.textContent = '0 tasks';
     activeTaskLabel.textContent = 'Focusing on: No task selected';
     return;
   }
-  
+
   emptyState.classList.add('hidden');
   tasksCountDisplay.textContent = `${tasks.length} task${tasks.length > 1 ? 's' : ''}`;
-  
+
   // Active task validation (if active task was deleted or completed, clear activeTaskId)
   const activeTaskExists = tasks.some(t => t.id === activeTaskId);
   if (!activeTaskExists && tasks.length > 0) {
     activeTaskId = null;
   }
-  
+
   // Separate tasks into To-Do and Completed
   const todoTasks = tasks.filter(t => !t.completed);
   const completedTasks = tasks.filter(t => t.completed);
-  
+
   // --- 1. Render To-Do Section ---
   const todoHeader = document.createElement('div');
   todoHeader.className = `task-group-header ${!todoListOpen ? 'collapsed' : ''}`;
@@ -686,16 +687,16 @@ function renderTasks() {
     renderTasks();
   });
   taskList.appendChild(todoHeader);
-  
+
   const todoContainer = document.createElement('div');
   todoContainer.className = `task-group-container ${!todoListOpen ? 'hidden' : ''}`;
-  
+
   todoTasks.forEach(task => {
     const taskItem = createTaskDOMNode(task);
     todoContainer.appendChild(taskItem);
   });
   taskList.appendChild(todoContainer);
-  
+
   // --- 2. Render Completed Section ---
   const completedHeader = document.createElement('div');
   completedHeader.className = `task-group-header ${!completedListOpen ? 'collapsed' : ''}`;
@@ -708,16 +709,16 @@ function renderTasks() {
     renderTasks();
   });
   taskList.appendChild(completedHeader);
-  
+
   const completedContainer = document.createElement('div');
   completedContainer.className = `task-group-container ${!completedListOpen ? 'hidden' : ''}`;
-  
+
   completedTasks.forEach(task => {
     const taskItem = createTaskDOMNode(task);
     completedContainer.appendChild(taskItem);
   });
   taskList.appendChild(completedContainer);
-  
+
   // Update header active task label
   updateActiveTaskLabel();
 }
@@ -727,7 +728,7 @@ function createTaskDOMNode(task) {
   const taskItem = document.createElement('div');
   taskItem.className = `task-item ${task.completed ? 'completed' : ''} ${task.id === activeTaskId ? 'active' : ''}`;
   taskItem.dataset.id = task.id;
-  
+
   taskItem.innerHTML = `
     <label class="checkbox-container">
       <input type="checkbox" ${task.completed ? 'checked' : ''}>
@@ -738,27 +739,27 @@ function createTaskDOMNode(task) {
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
     </button>
   `;
-  
+
   // Task toggle completion checkbox listener
   const checkbox = taskItem.querySelector('input[type="checkbox"]');
   checkbox.addEventListener('change', (e) => {
     e.stopPropagation();
     toggleTaskCompleted(task.id);
   });
-  
+
   // Prevent label clicks from triggering standard list item focus selection
   const label = taskItem.querySelector('.checkbox-container');
   label.addEventListener('click', (e) => {
     e.stopPropagation();
   });
-  
+
   // Delete task button listener
   const deleteBtn = taskItem.querySelector('.delete-task-btn');
   deleteBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     deleteTask(task.id);
   });
-  
+
   // Select active focus task (only if not completed and not clicking delete/checkbox)
   taskItem.addEventListener('click', (e) => {
     if (e.target.closest('.checkbox-container') || e.target.closest('.delete-task-btn')) {
@@ -766,14 +767,14 @@ function createTaskDOMNode(task) {
     }
     selectActiveTask(task.id);
   });
-  
+
   // Inline editing title via double-click
   const titleSpan = taskItem.querySelector('.task-title');
   titleSpan.addEventListener('dblclick', (e) => {
     e.stopPropagation();
     makeTaskEditable(titleSpan, task.id);
   });
-  
+
   return taskItem;
 }
 
@@ -785,7 +786,7 @@ function updateActiveTaskLabel() {
       return;
     }
   }
-  
+
   // Fallback to first uncompleted task
   const firstUncompleted = tasks.find(t => !t.completed);
   if (firstUncompleted) {
@@ -801,20 +802,20 @@ function handleAddTask(e) {
   e.preventDefault();
   const text = taskInput.value.trim();
   if (!text) return;
-  
+
   const newTask = {
     id: Date.now().toString(),
     title: text,
     completed: false
   };
-  
+
   tasks.push(newTask);
-  
+
   // Set as active focus task if it's the only one or if nothing is active
   if (tasks.length === 1 || !activeTaskId) {
     activeTaskId = newTask.id;
   }
-  
+
   taskInput.value = '';
   saveTasksToLocalStorage();
   renderTasks();
@@ -832,7 +833,7 @@ function toggleTaskCompleted(id) {
     }
     return task;
   });
-  
+
   saveTasksToLocalStorage();
   renderTasks();
 }
@@ -858,18 +859,18 @@ function selectActiveTask(id) {
 function makeTaskEditable(span, id) {
   span.contentEditable = "true";
   span.focus();
-  
+
   const range = document.createRange();
   const sel = window.getSelection();
   range.selectNodeContents(span);
   range.collapse(false);
   sel.removeAllRanges();
   sel.addRange(range);
-  
+
   const handleSave = () => {
     span.contentEditable = "false";
     const newTitle = span.textContent.trim();
-    
+
     if (newTitle) {
       tasks = tasks.map(task => {
         if (task.id === id) {
@@ -881,13 +882,13 @@ function makeTaskEditable(span, id) {
     }
     renderTasks();
   };
-  
+
   span.addEventListener('blur', handleSave, { once: true });
-  
+
   span.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      span.blur(); 
+      span.blur();
     }
     if (e.key === 'Escape') {
       span.textContent = tasks.find(t => t.id === id).title;
@@ -907,12 +908,12 @@ function openSettingsModal() {
   settingInterval.value = settings.interval;
   settingAutoMusic.checked = settings.autoMusic;
   settingSoundAlert.checked = settings.soundAlert;
-  
+
   // Set YouTube input values
   document.getElementById('setting-yt-pomodoro').value = settings.ytLinks.pomodoro || '';
   document.getElementById('setting-yt-short-break').value = settings.ytLinks.shortBreak || '';
   document.getElementById('setting-yt-long-break').value = settings.ytLinks.longBreak || '';
-  
+
   settingsModal.classList.remove('hidden');
 }
 
@@ -927,12 +928,12 @@ function handleSaveSettings() {
   const interval = Math.max(1, parseInt(settingInterval.value) || 4);
   const autoMusic = settingAutoMusic.checked;
   const soundAlert = settingSoundAlert.checked;
-  
+
   // Get YouTube links
   const ytPomodoro = document.getElementById('setting-yt-pomodoro').value.trim();
   const ytShortBreak = document.getElementById('setting-yt-short-break').value.trim();
   const ytLongBreak = document.getElementById('setting-yt-long-break').value.trim();
-  
+
   settings = {
     pomodoro: pMin,
     shortBreak: sMin,
@@ -947,15 +948,15 @@ function handleSaveSettings() {
       longBreak: ytLongBreak
     }
   };
-  
+
   saveSettingsToLocalStorage();
   closeSettingsModal();
-  
+
   // Recalculate focus time based on new setting
   stats.focusTime = stats.cycles * settings.pomodoro;
   saveStatsToLocalStorage();
   updateStatsDisplay();
-  
+
   musicEnabled = autoMusic;
   manageMusicPlayback();
 }
@@ -967,7 +968,7 @@ function setupEventListeners() {
   // Timer buttons
   startBtn.addEventListener('click', toggleTimer);
   skipBtn.addEventListener('click', skipCycle);
-  
+
   // Tab buttons
   tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -977,7 +978,7 @@ function setupEventListeners() {
       }
     });
   });
-  
+
   // Music selector & controls
   youtubeLinkInput.addEventListener('change', handleYoutubeUrlChange);
   youtubeLinkInput.addEventListener('keydown', (e) => {
@@ -985,7 +986,7 @@ function setupEventListeners() {
       youtubeLinkInput.blur();
     }
   });
-  
+
   musicToggleBtn.addEventListener('click', toggleMusicOption);
 
   // Volume slider and mute controls
@@ -1024,16 +1025,16 @@ function setupEventListeners() {
       }
     });
   }
-  
+
   // Task manager actions
   addTaskForm.addEventListener('submit', handleAddTask);
-  
+
   // Settings modal opening/closing
   settingsBtn.addEventListener('click', openSettingsModal);
   modalCloseBtn.addEventListener('click', closeSettingsModal);
   settingsCancelBtn.addEventListener('click', closeSettingsModal);
   settingsSaveBtn.addEventListener('click', handleSaveSettings);
-  
+
   settingsModal.addEventListener('click', (e) => {
     if (e.target === settingsModal) {
       closeSettingsModal();
@@ -1057,7 +1058,7 @@ function getLocalDateString(date = new Date()) {
 function checkDailyReset() {
   const todayStr = getLocalDateString();
   const todayCycles = dailyHistory[todayStr] || 0;
-  
+
   stats.cycles = todayCycles;
   stats.focusTime = todayCycles * settings.pomodoro;
   saveStatsToLocalStorage();
@@ -1067,7 +1068,7 @@ function checkDailyReset() {
 function calculateStreak(history) {
   let streak = 0;
   let checkDate = new Date();
-  
+
   // Check if today has at least 1 pomo
   const todayStr = getLocalDateString(checkDate);
   if (history[todayStr] && history[todayStr] > 0) {
@@ -1107,23 +1108,23 @@ function calculateStreak(history) {
 function renderContributionGraph() {
   const gridContainer = document.getElementById('calendar-grid');
   const monthLabelsContainer = document.getElementById('month-labels');
-  
+
   if (!gridContainer || !monthLabelsContainer) return;
-  
+
   gridContainer.innerHTML = '';
   monthLabelsContainer.innerHTML = '';
-  
+
   const today = new Date();
   const currentDayOfWeek = today.getDay();
-  
+
   // Find current Sunday
   const currentSunday = new Date(today);
   currentSunday.setDate(today.getDate() - currentDayOfWeek);
-  
+
   // Find Sunday 52 weeks ago
   const startDate = new Date(currentSunday);
   startDate.setDate(currentSunday.getDate() - 52 * 7);
-  
+
   // Generate 371 days
   const days = [];
   const dateCursor = new Date(startDate);
@@ -1131,15 +1132,15 @@ function renderContributionGraph() {
     days.push(new Date(dateCursor));
     dateCursor.setDate(dateCursor.getDate() + 1);
   }
-  
+
   // Generate Month Labels (53 columns)
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   let lastMonthName = "";
-  
+
   for (let col = 0; col < 53; col++) {
     const firstDayOfWeek = days[col * 7];
     const monthName = monthNames[firstDayOfWeek.getMonth()];
-    
+
     const labelSpan = document.createElement('span');
     if (monthName !== lastMonthName) {
       labelSpan.textContent = monthName;
@@ -1147,18 +1148,18 @@ function renderContributionGraph() {
     }
     monthLabelsContainer.appendChild(labelSpan);
   }
-  
+
   // Generate Grid Cells
   const todayTime = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
-  
+
   days.forEach(date => {
     const dateStr = getLocalDateString(date);
     const cellTime = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
     const count = dailyHistory[dateStr] || 0;
-    
+
     const cell = document.createElement('div');
     cell.className = 'calendar-cell';
-    
+
     if (cellTime > todayTime) {
       cell.classList.add('future');
     } else {
@@ -1170,16 +1171,16 @@ function renderContributionGraph() {
         else level = 4;
       }
       cell.classList.add(`level-${level}`);
-      
+
       const options = { month: 'short', day: 'numeric', year: 'numeric' };
       const formattedDate = date.toLocaleDateString('en-US', options);
       const pomoWord = count === 1 ? 'pomodoro' : 'pomodoros';
       cell.setAttribute('data-tooltip', `${count} ${pomoWord} on ${formattedDate}`);
     }
-    
+
     gridContainer.appendChild(cell);
   });
-  
+
   updateSidebarStats();
 }
 
@@ -1187,21 +1188,21 @@ function updateSidebarStats() {
   const totalPomoCountDisplay = document.getElementById('total-pomo-count');
   const currentStreakDisplay = document.getElementById('current-streak');
   const activeDaysCountDisplay = document.getElementById('active-days-count');
-  
+
   if (!totalPomoCountDisplay || !currentStreakDisplay || !activeDaysCountDisplay) return;
-  
+
   let totalPomo = 0;
   let activeDays = 0;
-  
+
   Object.values(dailyHistory).forEach(count => {
     if (count > 0) {
       totalPomo += count;
       activeDays += 1;
     }
   });
-  
+
   const streak = calculateStreak(dailyHistory);
-  
+
   totalPomoCountDisplay.textContent = totalPomo;
   currentStreakDisplay.textContent = streak;
   activeDaysCountDisplay.textContent = activeDays;
@@ -1214,48 +1215,48 @@ function updateSidebarStats() {
 function renderWeeklySummary() {
   const barChartContainer = document.getElementById('weekly-bar-chart');
   if (!barChartContainer) return;
-  
+
   barChartContainer.innerHTML = '';
-  
+
   const today = new Date();
   const day = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
   const diffToMonday = day === 0 ? -6 : 1 - day;
   const monday = new Date(today);
   monday.setDate(today.getDate() + diffToMonday);
-  
+
   const weekDays = [];
   for (let i = 0; i < 7; i++) {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
     weekDays.push(d);
   }
-  
+
   const dayMinutesList = weekDays.map(d => {
     const dateStr = getLocalDateString(d);
     const pomoCount = dailyHistory[dateStr] || 0;
     return pomoCount * settings.pomodoro;
   });
-  
+
   // Find maximum to scale height, minimum scale max is 100 minutes
   const maxMins = Math.max(100, ...dayMinutesList);
-  
+
   const dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
   const dayFullNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  
+
   weekDays.forEach((date, i) => {
     const mins = dayMinutesList[i];
     const pct = (mins / maxMins) * 100;
-    
+
     const colDiv = document.createElement('div');
     colDiv.className = 'chart-column';
-    
+
     const wrapperDiv = document.createElement('div');
     wrapperDiv.className = 'bar-wrapper';
-    
+
     const fillDiv = document.createElement('div');
     fillDiv.className = 'bar-fill';
     fillDiv.style.height = `${pct}%`;
-    
+
     if (mins > 0) {
       if (mins >= 100) {
         fillDiv.style.backgroundColor = 'var(--dark-accent)';
@@ -1263,20 +1264,20 @@ function renderWeeklySummary() {
     } else {
       fillDiv.style.height = '0%';
     }
-    
+
     const options = { month: 'short', day: 'numeric' };
     const formattedDate = date.toLocaleDateString('en-US', options);
     fillDiv.setAttribute('data-tooltip', `${mins} mins on ${dayFullNames[i]} (${formattedDate})`);
-    
+
     wrapperDiv.appendChild(fillDiv);
-    
+
     const labelSpan = document.createElement('span');
     labelSpan.className = 'day-label';
     labelSpan.textContent = dayLabels[i];
-    
+
     colDiv.appendChild(wrapperDiv);
     colDiv.appendChild(labelSpan);
-    
+
     barChartContainer.appendChild(colDiv);
   });
 }
@@ -1284,11 +1285,11 @@ function renderWeeklySummary() {
 function renderAchievements(totalPomo, streak, activeDays) {
   const achievementsContainer = document.getElementById('achievements-row');
   if (!achievementsContainer) return;
-  
+
   achievementsContainer.innerHTML = '';
-  
+
   const maxPomoInADay = Math.max(0, ...Object.values(dailyHistory));
-  
+
   const achievements = [
     {
       id: 'first-step',
@@ -1331,18 +1332,18 @@ function renderAchievements(totalPomo, streak, activeDays) {
       progress: `${Math.min(4, maxPomoInADay)}/4`
     }
   ];
-  
+
   achievements.forEach(ach => {
     const badgeContainer = document.createElement('div');
     badgeContainer.className = 'badge-container';
-    
+
     const badgeCircle = document.createElement('div');
     badgeCircle.className = `badge-circle ${ach.unlocked ? 'unlocked' : ''}`;
     badgeCircle.textContent = ach.icon;
-    
+
     const statusText = ach.unlocked ? 'Unlocked!' : 'Locked';
     badgeCircle.setAttribute('data-tooltip', `${ach.name}: ${ach.desc} (${ach.progress}) - ${statusText}`);
-    
+
     badgeContainer.appendChild(badgeCircle);
     achievementsContainer.appendChild(badgeContainer);
   });
