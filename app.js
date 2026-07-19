@@ -245,6 +245,8 @@ function startTimer() {
   startBtn.textContent = 'PAUSE';
   startBtn.style.boxShadow = '0 2px 0 var(--dark-accent)';
   startBtn.style.transform = 'translateY(4px)';
+  
+  document.querySelector('.timer-section')?.classList.add('timer-running');
 
   // Set target timestamp to avoid browser background throttle drifting
   endTime = Date.now() + timeLeft * 1000;
@@ -271,6 +273,8 @@ function stopTimer() {
   startBtn.textContent = 'START';
   startBtn.style.boxShadow = '0 6px 0 var(--dark-accent)';
   startBtn.style.transform = 'translateY(0)';
+  
+  document.querySelector('.timer-section')?.classList.remove('timer-running');
 
   if (timerInterval) {
     clearInterval(timerInterval);
@@ -381,14 +385,26 @@ function getMusicStatusText() {
 
 function updateAudioPlayback(forcePlay = false) {
   const url = (settings.ytLinks[currentMode] || '').trim();
+  const container = document.getElementById('youtube-player-container');
   if (!url) {
     musicTitle.textContent = "No Music URL Loaded";
     updateMusicUI(false, "Paste a YouTube or MP3 link");
+    if (container) {
+      container.classList.remove('active');
+    }
     return;
   }
 
   const shouldPlay = musicEnabled && (isPlaying || forcePlay);
   const isYt = isYoutubeUrl(url);
+
+  if (container) {
+    if (isYt && musicEnabled) {
+      container.classList.add('active');
+    } else {
+      container.classList.remove('active');
+    }
+  }
 
   if (isYt) {
     // Pause direct MP3 player if active
@@ -487,8 +503,8 @@ function handleYoutubeUrlChange() {
 // YouTube Player Callbacks
 window.onYouTubeIframeAPIReady = function () {
   ytPlayer = new YT.Player('youtube-player', {
-    height: '1',
-    width: '1',
+    height: '100%',
+    width: '100%',
     videoId: '', // loaded dynamically
     playerVars: {
       'playsinline': 1,

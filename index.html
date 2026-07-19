@@ -115,6 +115,12 @@
     <main class="app-main">
       <!-- Timer Block -->
       <section class="timer-section">
+        <!-- YouTube Player Container (Background) -->
+        <div id="youtube-player-container">
+          <div class="youtube-overlay"></div>
+          <div id="youtube-player"></div>
+        </div>
+        
         <div class="timer-tabs">
           <button class="tab-btn active" data-mode="pomodoro">Pomodoro</button>
           <button class="tab-btn" data-mode="shortBreak">Short Break</button>
@@ -302,11 +308,6 @@
         <button id="settings-save-btn" class="modal-btn-primary">Save Changes</button>
       </div>
     </div>
-  </div>
-
-  <!-- YouTube Player Container (Hidden) -->
-  <div id="youtube-player-container">
-    <div id="youtube-player"></div>
   </div>
   <audio id="audio-player-element" preload="auto" loop></audio>
 
