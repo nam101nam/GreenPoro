@@ -115,29 +115,31 @@
     <main class="app-main">
       <!-- Timer Block -->
       <section class="timer-section">
-        <!-- YouTube Player Container (Background) -->
-        <div id="youtube-player-container">
-          <div class="youtube-overlay"></div>
-          <div id="youtube-player"></div>
-        </div>
-        
         <div class="timer-tabs">
           <button class="tab-btn active" data-mode="pomodoro">Pomodoro</button>
           <button class="tab-btn" data-mode="shortBreak">Short Break</button>
           <button class="tab-btn" data-mode="longBreak">Long Break</button>
         </div>
-        
-        <div class="timer-display" id="timer-display">25:00</div>
-        
-        <div class="timer-controls">
-          <button id="start-btn" class="main-btn">START</button>
-          <button id="skip-btn" class="skip-btn" title="Skip Cycle">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 4 15 12 5 20"></polyline><line x1="19" y1="5" x2="19" y2="19"></line></svg>
-          </button>
-        </div>
 
-        <div class="active-task-label" id="active-task-label">
-          Focusing on: No task selected
+        <div class="timer-content-box">
+          <!-- YouTube Player Container (Background) -->
+          <div id="youtube-player-container">
+            <div class="youtube-overlay"></div>
+            <div id="youtube-player"></div>
+          </div>
+          
+          <div class="timer-display" id="timer-display">25:00</div>
+          
+          <div class="timer-controls">
+            <button id="start-btn" class="main-btn">START</button>
+            <button id="skip-btn" class="skip-btn" title="Skip Cycle">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 4 15 12 5 20"></polyline><line x1="19" y1="5" x2="19" y2="19"></line></svg>
+            </button>
+          </div>
+
+          <div class="active-task-label" id="active-task-label">
+            Focusing on: No task selected
+          </div>
         </div>
       </section>
 
